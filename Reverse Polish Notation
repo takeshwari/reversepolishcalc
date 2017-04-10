@@ -1,286 +1,200 @@
-// Reverse Polish Notation
+SOURCECODE: 
+#ifndef DYNINTSTACK_H
+#define DYNINTSTACK_H
+#define nullptr 0
+class DynIntStack
+{
+private:
+   struct StackNode
+   {
+      int value;        
+      StackNode *next; 
+   };
+   StackNode *top;  
+public:
+   DynIntStack()
+      {  top = nullptr; }
+   ~DynIntStack();
+   void push(int);
+   void pop(int &);
+   bool isEmpty();
+};
+#endif
 #include <iostream>
+#include "DynIntStack.h"
+#include <cstdlib>
+#define nullptr 0
+using namespace std;
+DynIntStack::~DynIntStack()
+{
+   StackNode *nodePtr = nullptr, *nextNode = nullptr;
+   nodePtr = top;
+   while (nodePtr != nullptr)
+   {
+      nextNode = nodePtr->next;
+      delete nodePtr;
+      nodePtr = nextNode;
+   }
+}
+void DynIntStack::push(int num)
+{
+   StackNode *newNode = nullptr; 
+   newNode = new StackNode;
+   newNode->value = num;
+   if (isEmpty())
+   {
+      top = newNode;
+      newNode->next = nullptr;
+   }
+   else 
+   {
+      newNode->next = top;
+      top = newNode;
+   }
+}
+
+//****************************************************
+// Member function pop pops the value at the top     *
+// of the stack off, and copies it into the variable *
+// passed as an argument.                            *
+//****************************************************
+
+void DynIntStack::pop(int &num)
+{
+   StackNode *temp = nullptr; // Temporary pointer
+
+   // First make sure the stack isn't empty.
+   if (isEmpty())
+   {
+      cout << "The stack is empty.\n";
+   }
+   else  // pop value off top of stack
+   {
+      num = top->value;
+      temp = top->next;
+      delete top;
+      top = temp;
+   }
+}
+
+//****************************************************
+// Member function isEmpty returns true if the stack *
+// is empty, or false otherwise.                     *
+//****************************************************
+
+bool DynIntStack::isEmpty()
+{
+   bool status;
+
+   if (!top)
+      status = true;
+   else
+      status = false;
+
+   return status;
+}
+
+#include <iostream>
+#include "DynIntStack.h"
 #include <string>
-#include <sstream>
-#include <iomanip>
+
 using namespace std;
 
-struct NODE
+int main()
 {
-       float num;
-       NODE *next;
-};
 
-class stack
-{
-    private:
-      NODE *head;
+string exp;
+int i=0;
+	cout<<"            This program is a Reverse Polish Calculator."<<endl;
+	cout<<"            Please included parenthesis for precedence."<<endl;
+     cout<<"            ENTER THE EXPRESSION." <<endl;
+    cin>>exp;
+     char op;
 
-    public:
-      stack();
-      void push(float);
-      float pop();
-      int nElements();
-      float display();
-};
-
-class RPN: public stack
-{
-    public:
-      void add();
-      void subtract();
-      void multiply();
-      void divide();
-};
-
-
-stack::stack()
-{
-     head = NULL;
-}
-
-void stack::push(float a_number)
-{
-     NODE *temp = new NODE;
-     if (temp)
-	 {
-        temp->num = a_number;
-        temp->next = head;
-        head = temp;
-     }
-}
-
-float stack::pop()
-{
-	float number = 0;
-
-
-    if (!head)
+     DynIntStack operand;
+	DynIntStack NUM;
+	//cout << exp.length() << endl;
+	//system ("PAUSE");
+	while ((i)< exp.length())
+    {
+      if (exp.at(i)=='(')
       {
-         return 0;
+          //cout << "found \( \n";
+          i++;
+          //cout << "i = " << i << endl;
+          //system ("PAUSE");
+          continue;
+
       }
-      else
-      {
-           NODE *temp = head;
-           number = head->num;
-           head = temp->next;
-           delete temp;
-      }
-      return number;
-}
-
-int stack::nElements()
-{
-    int counter=0;
-    for (NODE *node = head; node; node=node->next)
-    {
-        counter++;
-    }
-    return counter;
-}
-
-float stack::display()
-{
-
-	
-
-	 //ERROR CHECKING TOO MANY OPERANDS???       PRINTING TOO MANY OPERANDS FOR :   100 10 50 25 / * - -2 / =	, but still giving correct output && WILL NOT ALLOW ME TO DO A SECOND CALCULATAION , OUTPUT WILL BE TOO MANY OPERANDS
-
-	   if(nElements() !=1)
-	  {
-		   cout << "Error: too many operands" << endl;
-			return 1;
-	  }
-
-	   /*
-		//   if( nElements() < 2 )
-			{
-				cout << "Error: too many operators" << endl;
-				return 1;
-			}
-*/
-
-
-
-			   else //(nElements() > 0)
-			   {
-				 float temp = pop();
-				 cout << temp << endl;
-				 push(temp);
-
-				 return temp;
-
-			   }
-	 
-
-      
-}
-
-
-void RPN::add()
-{
-     if (nElements()>=2)
+      if ( isdigit(exp.at(i)))
      {
-        push(pop() + pop());
+     int num = exp.at(i) - '0' ;
+      i++;
+      NUM.push(num);
+      //cout << "found number; num = "<< num<< endl;
+      //cout << "i = " << i << endl;
+      //system ("PAUSE");
      }
-}
-
-void RPN::subtract()
-{
-     if (nElements()>=2)
+     if( exp.at(i) == ')')
      {
-        push(0 - pop() + pop());
-     }
-}
+         //cout << "Found \)";
+         //system("PAUSE");
 
-void RPN::multiply()
-{
-     if (nElements()>=2)
-     {
-        push(pop() * pop());
-     }
-}
-
-void RPN::divide()
-{
-     if (nElements()>=2)
-     {
-		 //if(pop() * pop() == 0)
-		// {
-			 //cout << "Error: Divide by 0.\n";
-		// }
-		
-			 push(1 / pop() * pop());	
-     }
-
-
-	 //else if( nElements()>=2)
-		// {
-    	//	 cout << "Error: Divide by 0.\n";						//??????
-		 //}
-		
-}
-
-//Function prototype for isOperator
-bool isOperator(const string& input);
-
-//Function prototype for perforOperation
-int performOperation(const string& input, RPN& calculator);
-
-Int main(){
-
-    RPN calculator;
-    string input;
-	
-     float num;
-
-    cout << "RPN Calculator: " << endl;
-    cout << "Input\n";
-
-
-    while(input != "0")
-           {
-               //Terminate program when 0 is entered by user
-               while(true)
-               {
-
-               // get input
-               cin >> input;
-
-               // check for being numeric value
-
-                   if(istringstream(input) >> num)
-                   {
-                       //use push function
-                	   calculator.push(num);
-                   }
-
-                   // check for operator
-                   else if(isOperator(input))
-                   {
-                       performOperation(input, calculator);
-                   }
-
-                   // If user enters 0 on a line followed by a new line, the program exits     ????????????
-                   else if(input == "0\n")
-                   {
-                       return -1;
-                   }
-
-
-               }
-               }
-   }
-
-bool isOperator(const string& input)
-{
-    static const string operators ="-+*/";
-    if (input.length() == 1) // right size to be an operator.
-    {
-        return operators.find_first_of(input[0]) != string::npos;
-        // look in the operator string for the first (and only) character in input
-    }
-    return false;
-}
-
-
-
-int performOperation(const string& input, RPN& calculator)
-{
-    //double firstOperand = 0;
-    //double secondOperand = 0;
-    //double result;
-
-
-
-    /*
-    if( calculator.size() > 2 )                      //Error check gives a false error for last input ???
-    {
-        cout << "Error: too many operands" << endl;
-        return 1;
-    }
-
-    //Error chceck for too many operators           ////STILL PRINT OUTPUT???
-    if( calculator.size() < 2 )
+        int value2;
+        NUM.pop(value2);
+        int value1;
+        int sum=0;
+        NUM.pop(value1);
+        i++;
+        int op;
+        operand.pop(op);
+        if (op==1)
         {
-            cout << "Error: too many operators" << endl;
-            return 1;
+            sum = value1+value2;
         }
-*/
-
-
-    switch (input[0])
-    {
-    case '+': calculator.add();
-              calculator.display();
-              break;
-    case '-': calculator.subtract();
-              calculator.display();
-              break;
-    case '*': calculator.multiply();
-              calculator.display();
-              break;
-    case '/':  calculator.divide();
-
-				//if (firstOperand / 0) 
-				//{
-				//	cout << "Error: Divide by 0.\n";
-				//}
-    		   calculator.display();
-    		  break;
+        if (op==2)
+        {
+            sum=value1-value2;
+        }
+        if (op==3)
+        {
+            sum= value1/value2;
+        }
+        if (op==4)
+        {
+            sum= value1*value2;
+        }
+        NUM.push(sum);
+     }
+     else
+     {
+         int OP=0;
+        char oper = exp.at(i);
+          if (oper=='+')
+        {
+         OP=1;
+        }
+        if (oper=='-')
+        {
+         OP=2;
+        }
+        if (oper=='/')
+        {
+            OP=3;
+        }
+        if (oper=='*')
+        {
+            OP=4;
+        }
+        i++;
+        operand.push(OP);
+        //cout << "found operator; oper = "<< oper<< " " << OP <<endl;
+      //cout << "i = " << i << endl;
+      //system ("PAUSE");
+     }
     }
-                        	/*
-                        	if (secondOperand == 0)
-                        	            { // moved this test to here because it's the only place it matters.
-                        	                cout << "Error: Division by 0.\n";
-                        	                return -1;
-                        	            }
-*/
-
-
-
-
-
-return 0;
-
+	int answer;
+	NUM.pop(answer);
+	cout<<"The answer is: " << answer<<endl;
+	return 0;
 }
